@@ -4,7 +4,7 @@ beforeAll(async () => {
 	await orchestrator.waitForAllServices();
 });
 
-describe("POST api/v1/status", () => {
+describe("POST /api/v1/status", () => {
 	describe("Anonymous user", () => {
 		test("Consulting current system status", async () => {
 			const response = await fetch("http://localhost:3000/api/v1/status", {
