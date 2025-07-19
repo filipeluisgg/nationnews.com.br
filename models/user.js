@@ -21,7 +21,7 @@ async function findOneByUsername(username) {
 			values: [username],
 		});
 
-		if (results.length === 0) {
+		if (results.rowCount === 0) {
 			throw new NotFoundError({
 				name: "NotFoundError",
 				message: "O username informado não foi encontrado no sistema.",
@@ -30,7 +30,7 @@ async function findOneByUsername(username) {
 			});
 		}
 
-		return results[0];
+		return results.rows[0];
 	}
 }
 
@@ -54,7 +54,7 @@ async function create(userInputValues) {
 			values: [email],
 		});
 
-		if (results.length > 0) {
+		if (results.rows.length > 0) {
 			throw new ValidationError({
 				message: "O email informado já está sendo utilizado.",
 				action: "Utilize outro email para efetuar o cadastro.",
@@ -75,7 +75,7 @@ async function create(userInputValues) {
 			values: [username],
 		});
 
-		if (results.length > 0) {
+		if (results.rows.length > 0) {
 			throw new ValidationError({
 				message: "O username informado já está sendo utilizado.",
 				action: "Utilize outro username para efetuar o cadastro.",
@@ -96,7 +96,7 @@ async function create(userInputValues) {
 			values: [userInputValues.username, userInputValues.email, userInputValues.password],
 		});
 
-		return results;
+		return results.rows;
 	}
 }
 

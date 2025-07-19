@@ -1,8 +1,8 @@
-//This file should contain the tests while the server and DB are not working.
 import database from "infra/database";
 import retry from "async-retry";
 import migrator from "models/migrator.js";
 
+//This function should contain the tests while the server and DB are not working.
 async function waitForAllServices() {
 	await waitForWebServer();
 
