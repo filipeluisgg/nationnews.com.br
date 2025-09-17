@@ -56,7 +56,7 @@ async function create(userInputValues) {
 			values: [userInputValues.username, userInputValues.email, userInputValues.password],
 		});
 
-		return results.rows;
+		return results.rows[0];
 	}
 }
 
