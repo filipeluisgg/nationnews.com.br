@@ -1,7 +1,7 @@
 {
 	"name": "clone-tabnews",
 	"version": "1.0.0",
-	"description": "Criação do nationnews.com.br!",
+	"description": "Implementação do https://www.tabnews.com.br para o https://curso.dev",
 	"main": "index.js",
 	"scripts": {
 		"dev": "npm run services:up && npm run services:wait:database && npm run migrations:up && next dev",
@@ -39,6 +39,7 @@
 	"devDependencies": {
 		"@commitlint/cli": "19.4.0",
 		"@commitlint/config-conventional": "19.2.2",
+		"@faker-js/faker": "9.7.0",
 		"commitizen": "4.3.0",
 		"concurrently": "8.2.2",
 		"cz-conventional-changelog": "3.3.0",
