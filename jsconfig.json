@@ -1,5 +1,10 @@
 {
 	"compilerOptions": {
-		"baseUrl": "."
-	}
+		"baseUrl": ".",
+		"checkJs": true,
+		"target": "es6",
+		"module": "commonjs",
+		"types": ["node", "jest", "react", "react-dom"]
+	},
+	"exclude": ["node_modules", ".next"]
 }
