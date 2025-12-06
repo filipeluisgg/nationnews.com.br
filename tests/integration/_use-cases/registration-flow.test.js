@@ -1,4 +1,5 @@
 import orchestrator from "tests/orchestrator.js";
+import activation from "models/activation.js";
 
 beforeAll(async () => {
 	await orchestrator.waitForAllServices();
@@ -8,6 +9,8 @@ beforeAll(async () => {
 });
 
 describe("Use case: Registration Flow (All successful", () => {
+	let createUserResponseBody;
+
 	test("Create user account", async () => {
 		const createUserResponse = await fetch("http://localhost:3000/api/v1/users", {
 			method: "POST",
@@ -16,31 +19,41 @@ describe("Use case: Registration Flow (All successful", () => {
 			},
 			body: JSON.stringify({
 				username: "RegistrationFlow",
-				email: "registration.flow@nationnews.com.br",
+				email: "registration.flow@email.com.br",
 				password: "RegistrationFlowPassword",
 			}),
 		});
 
 		expect(createUserResponse.status).toBe(201);
 
-		const createUserResponseBody = await createUserResponse.json();
+		createUserResponseBody = await createUserResponse.json();
 
 		expect(createUserResponseBody).toEqual({
 			id: createUserResponseBody.id,
 			username: "RegistrationFlow",
-			email: "registration.flow@nationnews.com.br",
+			email: "registration.flow@email.com.br",
 			features: ["read:activation_token"],
 			password: createUserResponseBody.password,
 			created_at: createUserResponseBody.created_at,
 			updated_at: createUserResponseBody.updated_at,
 		});
-
-		test("Receive activation email", async () => {});
-
-		test("Activate account", async () => {});
-
-		test("Login", async () => {});
-
-		test("Get user information", async () => {});
 	});
+
+	test("Receive activation email", async () => {
+		const lastEmail = await orchestrator.getLastEmail();
+
+		const activationToken = await activation.findOneByUserId(createUserResponseBody.id);
+
+		expect(lastEmail.sender).toBe("<contato@nationnews.com.br>");
+		expect(lastEmail.recipients[0]).toBe("<registration.flow@email.com.br>");
+		expect(lastEmail.subject).toBe("Ative seu cadastro no NationNews!");
+		expect(lastEmail.text).toContain("RegistrationFlow");
+		expect(lastEmail.text).toContain(activationToken.id);
+	});
+
+	test("Activate account", async () => {});
+
+	test("Login", async () => {});
+
+	test("Get user information", async () => {});
 });
