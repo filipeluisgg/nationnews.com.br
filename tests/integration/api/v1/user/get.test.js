@@ -10,11 +10,28 @@ beforeAll(async () => {
 });
 
 describe("GET /api/v1/user", () => {
+	describe("Anonymous user", () => {
+		test("Retrieving the endpoint", async () => {
+			const response = await fetch("http://localhost:3000/api/v1/user");
+
+			const responseBody = await response.json();
+
+			expect(responseBody).toEqual({
+				name: "ForbiddenError",
+				message: "Você não possui permissão para executar esta ação.",
+				action: 'Verifique se o seu usuário possui a feature "read:session"',
+				status_code: 403,
+			});
+		});
+	});
+
 	describe("Default user", () => {
 		test("With valid session", async () => {
 			const createdUser = await orchestrator.createUser({
 				username: "UserWithValidSession",
 			});
+
+			const activatedUser = await orchestrator.activateUser(createdUser);
 
 			const sessionObject = await orchestrator.createSession(createdUser.id);
 
@@ -35,10 +52,10 @@ describe("GET /api/v1/user", () => {
 				id: createdUser.id,
 				username: "UserWithValidSession",
 				email: createdUser.email,
-				features: ["read:activation_token"],
+				features: ["create:session", "read:session"],
 				password: createdUser.password,
 				created_at: createdUser.created_at.toISOString(),
-				updated_at: createdUser.updated_at.toISOString(),
+				updated_at: activatedUser.updated_at.toISOString(),
 			});
 
 			expect(uuidVersion(responseBody.id)).toBe(4);
@@ -72,6 +89,8 @@ describe("GET /api/v1/user", () => {
 				username: "UserHalfwayExpiredSession",
 			});
 
+			const activatedUser = await orchestrator.activateUser(createdUser);
+
 			const sessionObject = await orchestrator.createSession(createdUser.id);
 
 			jest.useRealTimers();
@@ -90,10 +109,10 @@ describe("GET /api/v1/user", () => {
 				id: createdUser.id,
 				username: "UserHalfwayExpiredSession",
 				email: createdUser.email,
-				features: ["read:activation_token"],
+				features: ["create:session", "read:session"],
 				password: createdUser.password,
 				created_at: createdUser.created_at.toISOString(),
-				updated_at: createdUser.updated_at.toISOString(),
+				updated_at: activatedUser.updated_at.toISOString(),
 			});
 
 			expect(uuidVersion(responseBody.id)).toBe(4);
