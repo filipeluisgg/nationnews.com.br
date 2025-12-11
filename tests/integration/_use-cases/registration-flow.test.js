@@ -43,7 +43,7 @@ describe("Use case: Registration Flow (All successful)", () => {
 		});
 	});
 
-	test("Receive activation email", async () => {
+	test("Receive activations email", async () => {
 		const lastEmail = await orchestrator.getLastEmail();
 
 		expect(lastEmail.sender).toBe("<contato@nationnews.com.br>");
@@ -62,16 +62,16 @@ describe("Use case: Registration Flow (All successful)", () => {
 	});
 
 	test("Activate account", async () => {
-		const activationResponse = await fetch(
+		const activationFirstResponse = await fetch(
 			`http://localhost:3000/api/v1/activations/${activationTokenId}`,
 			{
 				method: "PATCH",
 			},
 		);
 
-		expect(activationResponse.status).toBe(200);
+		expect(activationFirstResponse.status).toBe(200);
 
-		const activationResponseBody = await activationResponse.json();
+		const activationResponseBody = await activationFirstResponse.json();
 
 		expect(Date.parse(activationResponseBody.used_at)).not.toBeNaN();
 
