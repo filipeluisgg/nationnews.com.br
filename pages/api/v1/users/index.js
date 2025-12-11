@@ -5,7 +5,8 @@ import user from "models/user.js";
 
 const router = createRouter();
 
-router.post(postHandler);
+router.use(controller.injectAnonymousOrAuthenticatedUser);
+router.post(controller.canRequest("create:user"), postHandler);
 
 export default router.handler(controller.errorHandlers);
 
