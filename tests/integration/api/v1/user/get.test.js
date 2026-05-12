@@ -14,6 +14,8 @@ describe("GET /api/v1/user", () => {
 		test("Retrieving the endpoint", async () => {
 			const response = await fetch("http://localhost:3000/api/v1/user");
 
+			expect(response.status).toBe(403);
+
 			const responseBody = await response.json();
 
 			expect(responseBody).toEqual({
@@ -27,18 +29,12 @@ describe("GET /api/v1/user", () => {
 
 	describe("Default user", () => {
 		test("With valid session", async () => {
-			const createdUser = await orchestrator.createUser({
-				username: "UserWithValidSession",
-			});
-
+			const createdUser = await orchestrator.createUser({ username: "UserWithValidSession" });
 			const activatedUser = await orchestrator.activateUser(createdUser);
-
 			const sessionObject = await orchestrator.createSession(createdUser.id);
 
 			const response = await fetch("http://localhost:3000/api/v1/user", {
-				headers: {
-					Cookie: `session_id=${sessionObject.token}`,
-				},
+				headers: { Cookie: `session_id=${sessionObject.token}` },
 			});
 
 			expect(response.status).toBe(200);
@@ -52,8 +48,7 @@ describe("GET /api/v1/user", () => {
 				id: createdUser.id,
 				username: "UserWithValidSession",
 				email: createdUser.email,
-				features: ["create:session", "read:session"],
-				password: createdUser.password,
+				features: ["create:session", "read:session", "update:user"],
 				created_at: createdUser.created_at.toISOString(),
 				updated_at: activatedUser.updated_at.toISOString(),
 			});
@@ -81,24 +76,16 @@ describe("GET /api/v1/user", () => {
 		});
 
 		test("With halfway-expired session", async () => {
-			jest.useFakeTimers({
-				now: new Date(Date.now() - session.THIRTY_DAYS_IN_MILLISECONDS / 2),
-			});
+			jest.useFakeTimers({ now: new Date(Date.now() - session.THIRTY_DAYS_IN_MILLISECONDS / 2) });
 
-			const createdUser = await orchestrator.createUser({
-				username: "UserHalfwayExpiredSession",
-			});
-
+			const createdUser = await orchestrator.createUser({ username: "UserWithHalfwayExpiredSession" });
 			const activatedUser = await orchestrator.activateUser(createdUser);
-
 			const sessionObject = await orchestrator.createSession(createdUser.id);
 
 			jest.useRealTimers();
 
 			const response = await fetch("http://localhost:3000/api/v1/user", {
-				headers: {
-					cookie: `session_id=${sessionObject.token}`,
-				},
+				headers: { cookie: `session_id=${sessionObject.token}` },
 			});
 
 			expect(response.status).toBe(200);
@@ -107,10 +94,9 @@ describe("GET /api/v1/user", () => {
 
 			expect(responseBody).toEqual({
 				id: createdUser.id,
-				username: "UserHalfwayExpiredSession",
+				username: "UserWithHalfwayExpiredSession",
 				email: createdUser.email,
-				features: ["create:session", "read:session"],
-				password: createdUser.password,
+				features: ["create:session", "read:session", "update:user"],
 				created_at: createdUser.created_at.toISOString(),
 				updated_at: activatedUser.updated_at.toISOString(),
 			});
@@ -123,7 +109,6 @@ describe("GET /api/v1/user", () => {
 			const renewedSessionObject = await session.findOneValidByToken(sessionObject.token);
 
 			expect(renewedSessionObject.expires_at > sessionObject.expires_at).toEqual(true);
-
 			expect(renewedSessionObject.updated_at > sessionObject.updated_at).toEqual(true);
 
 			// Set‑Cookie assertions
@@ -143,9 +128,7 @@ describe("GET /api/v1/user", () => {
 				"b6499fb648a8cb66b8c8aed624a62c11155545e4931d16f7e0780b79038a7cd69c6cea9f5ae3eecf57b11a602d0bd5b5";
 
 			const response = await fetch("http://localhost:3000/api/v1/user", {
-				headers: {
-					cookie: `session_id=${nonexistentToken}`,
-				},
+				headers: { cookie: `session_id=${nonexistentToken}` },
 			});
 
 			expect(response.status).toBe(401);
@@ -160,9 +143,7 @@ describe("GET /api/v1/user", () => {
 			});
 
 			// Set-Cookie assertions
-			const parsedSetCookie = setCookieParser(response, {
-				map: true,
-			});
+			const parsedSetCookie = setCookieParser(response, { map: true });
 
 			expect(parsedSetCookie.session_id).toEqual({
 				name: "session_id",
@@ -174,22 +155,15 @@ describe("GET /api/v1/user", () => {
 		});
 
 		test("With expired session", async () => {
-			jest.useFakeTimers({
-				now: new Date(Date.now() - session.THIRTY_DAYS_IN_MILLISECONDS),
-			});
+			jest.useFakeTimers({ now: new Date(Date.now() - session.THIRTY_DAYS_IN_MILLISECONDS) });
 
-			const createdUser = await orchestrator.createUser({
-				username: "UserWithExpiredSession",
-			});
-
+			const createdUser = await orchestrator.createUser({ username: "UserWithExpiredSession" });
 			const sessionObject = await orchestrator.createSession(createdUser.id);
 
 			jest.useRealTimers();
 
 			const response = await fetch("http://localhost:3000/api/v1/user", {
-				headers: {
-					Cookie: `session_id=${sessionObject.token}`,
-				},
+				headers: { Cookie: `session_id=${sessionObject.token}` },
 			});
 
 			expect(response.status).toBe(401);
@@ -204,9 +178,7 @@ describe("GET /api/v1/user", () => {
 			});
 
 			// Set-Cookie assertions
-			const parsedSetCookie = setCookieParser(response, {
-				map: true,
-			});
+			const parsedSetCookie = setCookieParser(response, { map: true });
 
 			expect(parsedSetCookie.session_id).toEqual({
 				name: "session_id",

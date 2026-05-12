@@ -1,7 +1,7 @@
 import { version as uuidVersion } from "uuid";
 import orchestrator from "tests/orchestrator.js";
-import password from "models/password.js";
 import user from "models/user.js";
+import password from "models/password.js";
 
 beforeAll(async () => {
 	await orchestrator.waitForAllServices();
@@ -17,7 +17,7 @@ describe("POST /api/v1/users", () => {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					username: "luisfelipe",
-					email: "email@gmail.com",
+					email: "contato@gmail.com",
 					password: "senha123",
 				}),
 			});
@@ -29,9 +29,7 @@ describe("POST /api/v1/users", () => {
 			expect(responseBody).toEqual({
 				id: responseBody.id,
 				username: "luisfelipe",
-				email: "email@gmail.com",
 				features: ["read:activation_token"],
-				password: responseBody.password,
 				created_at: responseBody.created_at,
 				updated_at: responseBody.updated_at,
 			});
@@ -42,8 +40,7 @@ describe("POST /api/v1/users", () => {
 
 			const userInDatabase = await user.findOneByUsername("luisfelipe");
 			const correctPasswordMatch = await password.compare("senha123", userInDatabase.password);
-
-			const incorrectPasswordMatch = await password.compare("senhaErrada", userInDatabase.password);
+			const incorrectPasswordMatch = await password.compare("SenhaErrada", userInDatabase.password);
 
 			expect(correctPasswordMatch).toBe(true);
 			expect(incorrectPasswordMatch).toBe(false);
@@ -132,10 +129,9 @@ describe("POST /api/v1/users", () => {
 					"Content-Type": "application/json",
 					Cookie: `session_id=${user1SessionObject.token}`,
 				},
-
 				body: JSON.stringify({
 					username: "usuariologado",
-					email: "usuariologado@email.com",
+					email: "usuariologado@gmail.com",
 					password: "senha123",
 				}),
 			});
