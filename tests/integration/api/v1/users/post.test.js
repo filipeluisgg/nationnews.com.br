@@ -17,7 +17,7 @@ describe("POST /api/v1/users", () => {
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					username: "luisfelipe",
-					email: "email@gmail.com",
+					email: "contato@gmail.com",
 					password: "senha123",
 				}),
 			});
@@ -29,8 +29,7 @@ describe("POST /api/v1/users", () => {
 			expect(responseBody).toEqual({
 				id: responseBody.id,
 				username: "luisfelipe",
-				email: "email@gmail.com",
-				password: responseBody.password,
+				features: ["read:activation_token"],
 				created_at: responseBody.created_at,
 				updated_at: responseBody.updated_at,
 			});
@@ -41,8 +40,7 @@ describe("POST /api/v1/users", () => {
 
 			const userInDatabase = await user.findOneByUsername("luisfelipe");
 			const correctPasswordMatch = await password.compare("senha123", userInDatabase.password);
-
-			const incorrectPasswordMatch = await password.compare("senhaErrada", userInDatabase.password);
+			const incorrectPasswordMatch = await password.compare("SenhaErrada", userInDatabase.password);
 
 			expect(correctPasswordMatch).toBe(true);
 			expect(incorrectPasswordMatch).toBe(false);
@@ -115,6 +113,38 @@ describe("POST /api/v1/users", () => {
 				message: "O username informado já está sendo utilizado.",
 				action: "Utilize outro username para realizar esta operação.",
 				status_code: 400,
+			});
+		});
+	});
+
+	describe("Default user", () => {
+		test("With unique and valid data", async () => {
+			const user1 = await orchestrator.createUser();
+			await orchestrator.activateUser(user1);
+			const user1SessionObject = await orchestrator.createSession(user1.id);
+
+			const user2Response = await fetch("http://localhost:3000/api/v1/users", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Cookie: `session_id=${user1SessionObject.token}`,
+				},
+				body: JSON.stringify({
+					username: "usuariologado",
+					email: "usuariologado@gmail.com",
+					password: "senha123",
+				}),
+			});
+
+			expect(user2Response.status).toBe(403);
+
+			const user2ResponseBody = await user2Response.json();
+
+			expect(user2ResponseBody).toEqual({
+				name: "ForbiddenError",
+				message: "Você não possui permissão para executar esta ação.",
+				action: 'Verifique se o seu usuário possui a feature "create:user"',
+				status_code: 403,
 			});
 		});
 	});
