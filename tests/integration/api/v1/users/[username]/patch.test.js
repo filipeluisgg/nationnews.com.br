@@ -38,7 +38,7 @@ describe("PATCH /api/v1/users/[username]", () => {
 		test("With nonexistent `username`", async () => {
 			const createdUser = await orchestrator.createUser();
 			const activatedUser = await orchestrator.activateUser(createdUser);
-			const sessionObject = await orchestrator.createSession(activatedUser.id);
+			const sessionObject = await orchestrator.createSession(activatedUser);
 
 			const response = await fetch(`${webserver.origin}/api/v1/users/UsuarioInexistente`, {
 				method: "PATCH",
@@ -61,7 +61,7 @@ describe("PATCH /api/v1/users/[username]", () => {
 			await orchestrator.createUser({ username: "user1" });
 			const createdUser2 = await orchestrator.createUser({ username: "user2" });
 			const activatedUser2 = await orchestrator.activateUser(createdUser2);
-			const sessionObject2 = await orchestrator.createSession(activatedUser2.id);
+			const sessionObject2 = await orchestrator.createSession(activatedUser2);
 
 			const response = await fetch(`${webserver.origin}/api/v1/users/user2`, {
 				method: "PATCH",
@@ -88,7 +88,7 @@ describe("PATCH /api/v1/users/[username]", () => {
 			await orchestrator.createUser({ username: "userA" });
 			const createdUserB = await orchestrator.createUser({ username: "userB" });
 			const activatedUserB = await orchestrator.activateUser(createdUserB);
-			const sessionObject2 = await orchestrator.createSession(activatedUserB.id);
+			const sessionObject2 = await orchestrator.createSession(activatedUserB);
 
 			const response = await fetch(`${webserver.origin}/api/v1/users/userA`, {
 				method: "PATCH",
@@ -115,7 +115,7 @@ describe("PATCH /api/v1/users/[username]", () => {
 			await orchestrator.createUser({ email: "email1@gmail.com" });
 			const createdUser2 = await orchestrator.createUser({ email: "email2@gmail.com" });
 			const activatedUser2 = await orchestrator.activateUser(createdUser2);
-			const sessionObject2 = await orchestrator.createSession(activatedUser2.id);
+			const sessionObject2 = await orchestrator.createSession(activatedUser2);
 
 			const response = await fetch(`${webserver.origin}/api/v1/users/${createdUser2.username}`, {
 				method: "PATCH",
@@ -141,7 +141,7 @@ describe("PATCH /api/v1/users/[username]", () => {
 		test("With unique `username`", async () => {
 			const createdUser = await orchestrator.createUser();
 			const activatedUser = await orchestrator.activateUser(createdUser);
-			const sessionObject = await orchestrator.createSession(activatedUser.id);
+			const sessionObject = await orchestrator.createSession(activatedUser);
 
 			const response = await fetch(`${webserver.origin}/api/v1/users/${createdUser.username}`, {
 				method: "PATCH",
@@ -173,7 +173,7 @@ describe("PATCH /api/v1/users/[username]", () => {
 		test("With unique `email`", async () => {
 			const createdUser = await orchestrator.createUser();
 			const activatedUser = await orchestrator.activateUser(createdUser);
-			const sessionObject = await orchestrator.createSession(activatedUser.id);
+			const sessionObject = await orchestrator.createSession(activatedUser);
 
 			const response = await fetch(`${webserver.origin}/api/v1/users/${createdUser.username}`, {
 				method: "PATCH",
@@ -209,7 +209,7 @@ describe("PATCH /api/v1/users/[username]", () => {
 		test("With new `password`", async () => {
 			const createdUser = await orchestrator.createUser({ password: "newPassword1" });
 			const activatedUser = await orchestrator.activateUser(createdUser);
-			const sessionObject = await orchestrator.createSession(activatedUser.id);
+			const sessionObject = await orchestrator.createSession(activatedUser);
 
 			const response = await fetch(`${webserver.origin}/api/v1/users/${createdUser.username}`, {
 				method: "PATCH",
@@ -251,7 +251,7 @@ describe("PATCH /api/v1/users/[username]", () => {
 			const privilegedUser = await orchestrator.createUser();
 			const activatedPrivilegedUser = await orchestrator.activateUser(privilegedUser);
 			await orchestrator.addFeaturesToUser(privilegedUser, ["update:user:others"]);
-			const privilegedUserSession = await orchestrator.createSession(activatedPrivilegedUser.id);
+			const privilegedUserSession = await orchestrator.createSession(activatedPrivilegedUser);
 
 			const defaultUser = await orchestrator.createUser();
 

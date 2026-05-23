@@ -32,7 +32,7 @@ describe("GET /api/v1/user", () => {
 		test("With valid session", async () => {
 			const createdUser = await orchestrator.createUser({ username: "UserWithValidSession" });
 			const activatedUser = await orchestrator.activateUser(createdUser);
-			const sessionObject = await orchestrator.createSession(createdUser.id);
+			const sessionObject = await orchestrator.createSession(createdUser);
 
 			const response = await fetch(`${webserver.origin}/api/v1/user`, {
 				headers: { Cookie: `session_id=${sessionObject.token}` },
@@ -81,7 +81,7 @@ describe("GET /api/v1/user", () => {
 
 			const createdUser = await orchestrator.createUser({ username: "UserWithHalfwayExpiredSession" });
 			const activatedUser = await orchestrator.activateUser(createdUser);
-			const sessionObject = await orchestrator.createSession(createdUser.id);
+			const sessionObject = await orchestrator.createSession(createdUser);
 
 			jest.useRealTimers();
 
@@ -159,7 +159,7 @@ describe("GET /api/v1/user", () => {
 			jest.useFakeTimers({ now: new Date(Date.now() - session.THIRTY_DAYS_IN_MILLISECONDS) });
 
 			const createdUser = await orchestrator.createUser({ username: "UserWithExpiredSession" });
-			const sessionObject = await orchestrator.createSession(createdUser.id);
+			const sessionObject = await orchestrator.createSession(createdUser);
 
 			jest.useRealTimers();
 
