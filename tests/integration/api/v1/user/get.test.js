@@ -69,6 +69,7 @@ describe("GET /api/v1/user", () => {
 
 			expect(parsedSetCookie.session_id).toEqual({
 				name: "session_id",
+				sameSite: "Lax",
 				value: sessionObject.token,
 				maxAge: session.THIRTY_DAYS_IN_MILLISECONDS / 1000,
 				path: "/",
@@ -117,6 +118,7 @@ describe("GET /api/v1/user", () => {
 
 			expect(parsedSetCookie.session_id).toEqual({
 				name: "session_id",
+				sameSite: "Lax",
 				value: sessionObject.token,
 				maxAge: session.THIRTY_DAYS_IN_MILLISECONDS / 1000,
 				path: "/",
