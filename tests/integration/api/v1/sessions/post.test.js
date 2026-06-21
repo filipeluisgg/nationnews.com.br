@@ -12,8 +12,6 @@ beforeAll(async () => {
 
 describe("POST /api/v1/sessions", () => {
 	describe("Anonymous user", () => {
-		const fiveSecondsToleranceInMillisseconds = 5000;
-
 		test("With incorrect `email` but corret `password`", async () => {
 			await orchestrator.createUser({
 				password: "senha-correta",
