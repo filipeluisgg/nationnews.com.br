@@ -6,6 +6,8 @@ services:
       - ../.env.development
     ports:
       - "5432:5432"
+    # The localhost database can be accessed using the command below:
+    # docker exec -it postgres-dev psql -U local_user -d local_db
 
   mailcatcher:
     container_name: "mailcatcher-dev"
@@ -13,3 +15,5 @@ services:
     ports:
       - "1025:1025"
       - "1080:1080"
+    # The localhost MailCatcher server can be accessed in the URL below:
+    # http://localhost:1080/
