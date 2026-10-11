@@ -7,7 +7,7 @@ import authorization from "./authorization";
 
 const FIFTEEN_MINUTES_IN_MILLISECONDS = 60 * 15 * 1000;
 
-async function findOneValidById(tokenId) {
+async function findOneById(tokenId) {
 	const activationTokenObject = await runSelectQuery(tokenId);
 	return activationTokenObject;
 
@@ -20,8 +20,6 @@ async function findOneValidById(tokenId) {
                     user_activation_tokens
                 WHERE
                     id = $1
-                    AND expires_at > NOW()
-                    AND used_at IS NULL
                 LIMIT
                     1
             ;`,
@@ -30,7 +28,7 @@ async function findOneValidById(tokenId) {
 
 		if (results.rowCount === 0) {
 			throw new NotFoundError({
-				message: "O token de ativação utilizado não foi encontrado no sistema ou expirou.",
+				message: "O token de ativação utilizado não foi encontrado no sistema.",
 				action: "Faça um novo cadastro.",
 			});
 		}
@@ -107,11 +105,30 @@ async function sendEmailToUser(user, activationToken) {
 		subject: "Ative seu cadastro no NationNews!",
 		text: `${user.username}, clique no link abaixo para ativar seu cadastro no NationNews:
 		
-https://${webserver.origin}/cadastro/ativar/${activationToken.id}
+${webserver.origin}/cadastro/ativar/${activationToken.id}
 
 Atenciosamente,
 Equipe NationNews.`,
 	});
+}
+
+async function activateUserByTokenId(tokenId) {
+	const activationToken = await findOneById(tokenId);
+	const isTokenExpired = new Date(activationToken.expires_at) < new Date();
+
+	if (isTokenExpired) {
+		throw new NotFoundError({
+			message: "O token de ativação utilizado não foi encontrado no sistema ou expirou.",
+			action: "Faça um novo cadastro.",
+		});
+	}
+
+	if (activationToken.used_at) {
+		return activationToken;
+	}
+
+	await activateUserByUserId(activationToken.user_id);
+	return await markTokenAsUsed(tokenId);
 }
 
 const activation = {
@@ -119,8 +136,9 @@ const activation = {
 	create,
 	sendEmailToUser,
 	markTokenAsUsed,
-	findOneValidById,
+	findOneById,
 	activateUserByUserId,
+	activateUserByTokenId,
 };
 
 export default activation;

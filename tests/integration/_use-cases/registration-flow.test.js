@@ -53,7 +53,7 @@ describe("Use case: Registration Flow (all successful)", () => {
 
 		expect(lastEmail.text).toContain(`${webserver.origin}/cadastro/ativar/${activationTokenId}`);
 
-		const activationTokenObject = await activation.findOneValidById(activationTokenId);
+		const activationTokenObject = await activation.findOneById(activationTokenId);
 
 		expect(activationTokenObject.user_id).toBe(createUserResponseBody.id);
 		expect(activationTokenObject.used_at).toBe(null);
